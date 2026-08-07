@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virgo Rent Car - Pekanbaru</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Playfair Display', 'serif'] },
+                    colors: {
+                        virgo: {
+                            blue: '#0D47A1', blueLight: '#1565C0', blueSoft: '#1976D2',
+                            green: '#2E7D32', greenLight: '#43A047', greenSoft: '#66BB6A',
+                            yellow: '#F9A825', yellowLight: '#FDD835', yellowSoft: '#FFEE58',
+                            dark: '#0a1628', darker: '#060e1a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="grid-pattern">
+
+    <!-- ==================== NAVBAR ==================== -->
+    <nav class="navbar fixed top-0 left-0 right-0 z-[9999]" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="index.php" class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl grad-blue-green flex items-center justify-center">
+                    <i class="fas fa-car text-white text-lg"></i>
+                </div>
+                <div>
+                    <span class="text-white font-bold text-lg tracking-tight">VIRGO</span>
+                    <span class="text-slate-400 font-light text-lg ml-1">Rent Car</span>
+                </div>
+            </a>
+            <div class="hidden md:flex items-center gap-8">
+                <a href="index.php" class="nav-link active">Beranda</a>
+                <a href="armada.php" class="nav-link ">Armada</a>
+                <a href="driver.php" class="nav-link ">Driver</a>
+<a href="wisata.php" class="nav-link ">Wisata</a>
+                <a href="pemesanan.php" class="nav-link ">Pemesanan</a>
+            </div>
+<div class="flex items-center gap-4">
+                <!-- Tombol Login Admin (logo saja, tanpa tulisan) -->
+                <a href="admin/login.php" title="Login Admin" class="hidden sm:flex w-9 h-9 rounded-lg bg-white/10 border border-white/15 items-center justify-center text-slate-300 hover:text-white hover:border-blue-400/50 hover:bg-blue-500/20 transition-all">
+                    <i class="fas fa-user-shield"></i>
+                </a>
+                <a href="https://wa.me/6285121540024" target="_blank" class="hidden sm:flex items-center gap-2 btn-primary text-xs py-3 px-5">
+                    <i class="fab fa-whatsapp text-base"></i> Hubungi Kami
+                </a>
+                <button class="md:hidden text-white text-2xl" id="menuToggle" aria-label="Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="absolute top-6 right-6 text-white text-3xl" id="menuClose" aria-label="Tutup menu">
+            <i class="fas fa-times"></i>
+        </button>
+        <a href="index.php">Beranda</a>
+        <a href="armada.php">Armada</a>
+        <a href="driver.php">Driver</a>
+<a href="wisata.php">Wisata</a>
+        <a href="pemesanan.php">Pemesanan</a>
+<a href="admin/login.php" title="Login Admin" class="text-slate-400 mt-4">
+            <i class="fas fa-user-shield"></i>
+        </a>
+        <a href="https://wa.me/6285121540024" class="btn-primary mt-4">
+            <i class="fab fa-whatsapp text-lg"></i> Hubungi Kami
+        </a>
+    </div>
+    
+    <!-- Spacer agar konten tidak ketutup navbar fixed -->
+    <div class="h-20"></div>
+
+<!-- ==================== HERO ==================== -->
+<section class="hero-bg min-h-[80vh] flex items-center relative" id="hero">
+    <div class="max-w-7xl mx-auto px-6 py-20 w-full relative z-10">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+                <div class="flex items-center gap-3 mb-8 fade-up">
+                    <div class="badge-blue"><i class="fas fa-map-marker-alt mr-1"></i> Pekanbaru, Riau</div>
+                    <div class="badge-green">Tersedia 24/7</div>
+                </div>
+                <h1 class="hero-title font-serif text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.05] tracking-tight mb-6 fade-up" style="transition-delay:0.1s">
+                    Solusi Rental<br>
+                    <span class="grad-text">Mobil Terpercaya</span><br>
+                    di Pekanbaru
+                </h1>
+                <p class="text-slate-400 text-base md:text-lg leading-relaxed max-w-lg mb-10 fade-up" style="transition-delay:0.2s">
+                    Nikmati perjalanan nyaman dengan armada terbaik dan driver berpengalaman. Tersedia juga paket wisata untuk menjelajahi keindahan Riau.
+                </p>
+                <div class="flex flex-wrap gap-4 mb-12 fade-up" style="transition-delay:0.3s">
+                    <a href="pemesanan.php" class="btn-primary text-sm py-4 px-8">
+                        <i class="fas fa-calendar-check"></i> Pesan Sekarang
+                    </a>
+                    <a href="armada.php" class="border border-slate-700 text-white rounded-[14px] py-4 px-8 text-sm font-semibold hover:border-slate-500 hover:bg-white/5 transition-all inline-flex items-center gap-2">
+                        <i class="fas fa-eye"></i> Lihat Armada
+                    </a>
+                </div>
+                <div class="grid grid-cols-3 gap-6 fade-up" style="transition-delay:0.4s">
+                    <div>
+                        <div class="text-2xl md:text-3xl font-bold grad-text">50+</div>
+                        <div class="text-slate-500 text-xs mt-1 uppercase tracking-wider">Unit Armada</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl md:text-3xl font-bold grad-text">5K+</div>
+                        <div class="text-slate-500 text-xs mt-1 uppercase tracking-wider">Pelanggan Puas</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl md:text-3xl font-bold grad-text">8+</div>
+                        <div class="text-slate-500 text-xs mt-1 uppercase tracking-wider">Tahun Pengalaman</div>
+                    </div>
+                </div>
+            </div>
+            <div class="relative hidden lg:block fade-up" style="transition-delay:0.3s">
+                <div class="relative rounded-3xl overflow-hidden shadow-2xl" style="aspect-ratio:4/3;">
+                    <img src="1.png" alt="Virgo Rent Car" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-virgo-darker/60 via-transparent to-transparent"></div>
+                </div>
+                <div class="absolute -bottom-6 -left-6 card-glass p-5 rounded-2xl">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-xl grad-green-yellow flex items-center justify-center"><i class="fas fa-shield-alt text-white"></i></div>
+                        <div>
+                            <div class="text-white font-semibold text-sm">Asuransi Lengkap</div>
+                            <div class="text-slate-400 text-xs">Setiap perjalanan</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="absolute -top-4 -right-4 card-glass p-5 rounded-2xl">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-xl grad-blue-green flex items-center justify-center"><i class="fas fa-star text-white"></i></div>
+                        <div>
+                            <div class="text-white font-semibold text-sm">Rating 4.9</div>
+                            <div class="text-slate-400 text-xs">Google Reviews</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ==================== KEUNGGULAN ==================== -->
+<section class="py-24">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center mb-16 fade-up">
+            <h2 class="section-title font-serif text-4xl md:text-5xl font-bold text-white mb-4">
+                Mengapa <span class="grad-text">Virgo Rent Car</span>?
+            </h2>
+        </div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="card-glass p-6 text-center fade-up">
+                <div class="w-14 h-14 mx-auto rounded-2xl grad-blue-green flex items-center justify-center mb-4"><i class="fas fa-shield-alt text-white text-xl"></i></div>
+                <h4 class="text-white font-bold text-sm mb-2">Asuransi Lengkap</h4>
+                <p class="text-slate-500 text-xs leading-relaxed">Setiap kendaraan dilindungi asuransi all risk untuk ketenangan Anda.</p>
+            </div>
+            <div class="card-glass p-6 text-center fade-up" style="transition-delay:0.1s">
+                <div class="w-14 h-14 mx-auto rounded-2xl grad-green-yellow flex items-center justify-center mb-4"><i class="fas fa-wrench text-white text-xl"></i></div>
+                <h4 class="text-white font-bold text-sm mb-2">Armada Terawat</h4>
+                <p class="text-slate-500 text-xs leading-relaxed">Perawatan rutin berkala memastikan kendaraan selalu prima dan nyaman.</p>
+            </div>
+            <div class="card-glass p-6 text-center fade-up" style="transition-delay:0.2s">
+                <div class="w-14 h-14 mx-auto rounded-2xl grad-blue-yellow flex items-center justify-center mb-4"><i class="fas fa-headset text-white text-xl"></i></div>
+                <h4 class="text-white font-bold text-sm mb-2">Layanan 24/7</h4>
+                <p class="text-slate-500 text-xs leading-relaxed">Tim kami siap melayani kapan saja, termasuk darurat di perjalanan.</p>
+            </div>
+<div class="card-glass p-6 text-center fade-up" style="transition-delay:0.3s">
+                <div class="w-14 h-14 mx-auto rounded-2xl grad-main flex items-center justify-center mb-4"><i class="fas fa-tag text-white text-xl"></i></div>
+                <h4 class="text-white font-bold text-sm mb-2">Harga Transparan</h4>
+                <p class="text-slate-500 text-xs leading-relaxed">Tanpa biaya tersembunyi. Apa yang tertera adalah yang Anda bayar.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ==================== TESTIMONI PELANGGAN ==================== -->
+<section class="py-24 relative overflow-hidden" id="testimoni">
+    <!-- Dekorasi latar -->
+    <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute -top-20 -left-20 w-72 h-72 rounded-full bg-blue-600/10 blur-3xl"></div>
+        <div class="absolute bottom-0 -right-20 w-80 h-80 rounded-full bg-green-600/10 blur-3xl"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-yellow-500/5 blur-3xl"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-6 relative">
+        <!-- Section Header -->
+        <div class="text-center mb-16 fade-up">
+            <div class="badge-yellow inline-flex items-center gap-2 mb-4">
+                <i class="fas fa-star"></i> TESTIMONI PELANGGAN
+            </div>
+            <h2 class="section-title font-serif text-4xl md:text-5xl font-bold text-white mb-4">
+                Apa Kata <span class="grad-text">Mereka</span>?
+            </h2>
+            <p class="text-slate-400 max-w-xl mx-auto text-sm leading-relaxed">
+                Kepercayaan Anda adalah prioritas kami. Berikut pengalaman pelanggan yang telah menggunakan layanan Virgo Rent Car.
+            </p>
+        </div>
+
+                <!-- ===== Ringkasan Rating + Distribusi ===== -->
+        <div class="card-glass p-8 md:p-10 mb-14 fade-up">
+            <div class="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
+                <!-- Skor rata-rata -->
+                <div class="text-center lg:text-left">
+                    <div class="flex flex-col lg:flex-row items-center lg:items-end gap-4">
+                        <div class="avg-rating-hero">4</div>
+                        <div class="pb-1">
+                            <div class="flex gap-1 mb-2"><i class="fas fa-star text-yellow-400 text-sm"></i><i class="fas fa-star text-yellow-400 text-sm"></i><i class="fas fa-star text-yellow-400 text-sm"></i><i class="fas fa-star text-yellow-400 text-sm"></i><i class="far fa-star text-slate-600 text-sm"></i></div>
+                            <div class="text-slate-400 text-sm">dari 5.0 bintang</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center justify-center lg:justify-start gap-3 text-slate-400 text-sm">
+                        <i class="fas fa-check-circle text-green-400"></i>
+                        <span>Berisi <strong class="text-white">1</strong> ulasan dari pelanggan terpercaya</span>
+                    </div>
+                    <div class="mt-6 flex flex-wrap gap-3 justify-center lg:justify-start">
+                        <a href="ulasan.php" class="btn-yellow !w-auto">
+                            <i class="fas fa-pen"></i> Tulis Ulasan
+                        </a>
+                        <a href="ulasan.php" class="border border-slate-700 text-white rounded-[14px] px-6 py-3 text-sm font-semibold hover:border-slate-500 hover:bg-white/5 transition-all inline-flex items-center gap-2">
+                            <i class="fas fa-comments"></i> Lihat Semua
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Distribusi rating -->
+                <div class="space-y-3">
+                                        <div class="flex items-center gap-3">
+                        <span class="text-sm text-slate-300 font-semibold w-8 text-right">5</span>
+                        <i class="fas fa-star text-yellow-400 text-xs"></i>
+                        <div class="rating-bar-track">
+                            <div class="rating-bar-fill" style="width: 0%;"></div>
+                        </div>
+                        <span class="text-xs text-slate-500 w-10">0</span>
+                    </div>
+                                        <div class="flex items-center gap-3">
+                        <span class="text-sm text-slate-300 font-semibold w-8 text-right">4</span>
+                        <i class="fas fa-star text-yellow-400 text-xs"></i>
+                        <div class="rating-bar-track">
+                            <div class="rating-bar-fill" style="width: 100%;"></div>
+                        </div>
+                        <span class="text-xs text-slate-500 w-10">1</span>
+                    </div>
+                                        <div class="flex items-center gap-3">
+                        <span class="text-sm text-slate-300 font-semibold w-8 text-right">3</span>
+                        <i class="fas fa-star text-yellow-400 text-xs"></i>
+                        <div class="rating-bar-track">
+                            <div class="rating-bar-fill" style="width: 0%;"></div>
+                        </div>
+                        <span class="text-xs text-slate-500 w-10">0</span>
+                    </div>
+                                        <div class="flex items-center gap-3">
+                        <span class="text-sm text-slate-300 font-semibold w-8 text-right">2</span>
+                        <i class="fas fa-star text-yellow-400 text-xs"></i>
+                        <div class="rating-bar-track">
+                            <div class="rating-bar-fill" style="width: 0%;"></div>
+                        </div>
+                        <span class="text-xs text-slate-500 w-10">0</span>
+                    </div>
+                                        <div class="flex items-center gap-3">
+                        <span class="text-sm text-slate-300 font-semibold w-8 text-right">1</span>
+                        <i class="fas fa-star text-yellow-400 text-xs"></i>
+                        <div class="rating-bar-track">
+                            <div class="rating-bar-fill" style="width: 0%;"></div>
+                        </div>
+                        <span class="text-xs text-slate-500 w-10">0</span>
+                    </div>
+                                    </div>
+            </div>
+        </div>
+
+        <!-- ===== Grid Testimoni ===== -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="card-glass testimonial-card p-6 flex flex-col fade-up">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+                    <div class="flex gap-1"><i class="fas fa-star text-yellow-400 text-sm"></i><i class="fas fa-star text-yellow-400 text-sm"></i><i class="fas fa-star text-yellow-400 text-sm"></i><i class="fas fa-star text-yellow-400 text-sm"></i><i class="far fa-star text-slate-600 text-sm"></i></div>
+                </div>
+                <p class="text-slate-400 text-sm leading-relaxed flex-1 mb-6">
+                    sangat bagus                </p>
+                <div class="flex items-center gap-3 pt-4 border-t border-slate-800/50">
+                    <div class="testimonial-avatar grad-blue-green">K</div>
+                    <div class="min-w-0">
+                        <div class="text-white font-semibold text-sm truncate">Karya Motor</div>
+                        <div class="text-slate-500 text-xs flex items-center gap-1">
+                            <i class="fas fa-car"></i>Daihatsu Terios                        </div>
+                    </div>
+                    <div class="ml-auto text-slate-600 text-[10px] whitespace-nowrap">05 Aug 2026</div>
+                </div>
+            </div>
+                    </div>
+
+        <!-- Tombol Lihat Semua -->
+        <div class="text-center mt-12 fade-up">
+            <a href="ulasan.php" class="btn-primary">
+                <i class="fas fa-comments"></i> Lihat Semua Ulasan
+            </a>
+        </div>
+
+            </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+    <footer class="border-t border-slate-800/50 pt-16 pb-8 mt-24">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid md:grid-cols-4 gap-12 mb-12">
+                <div class="md:col-span-2">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-xl grad-blue-green flex items-center justify-center">
+                            <i class="fas fa-car text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <span class="text-white font-bold text-lg">VIRGO</span>
+                            <span class="text-slate-400 font-light text-lg ml-1">Rent Car</span>
+                        </div>
+                    </div>
+                    <p class="text-slate-500 text-sm leading-relaxed max-w-md mb-6">
+                        Layanan rental mobil terpercaya di Pekanbaru, Riau. Menyediakan armada berkualitas, driver profesional, dan paket wisata untuk kebutuhan perjalanan Anda.
+                    </p>
+                    <div class="flex gap-3">
+                        <a href="https://www.instagram.com/riandi2404?igsh=MTZudWRnMHBnN2hqZA%3D%3D&utm_source=qr" class="w-10 h-10 rounded-xl bg-slate-800/50 flex items-center justify-center text-slate-400 hover:text-white hover:bg-blue-600/20 transition-all"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.facebook.com/share/1DRKHEuh8a/?mibextid=wwXIfr" class="w-10 h-10 rounded-xl bg-slate-800/50 flex items-center justify-center text-slate-400 hover:text-white hover:bg-blue-600/20 transition-all"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://wa.me/6285121540024" class="w-10 h-10 rounded-xl bg-slate-800/50 flex items-center justify-center text-slate-400 hover:text-white hover:bg-green-600/20 transition-all"><i class="fab fa-whatsapp"></i></a>
+                        <a href="https://www.tiktok.com/@ndy_24_?_r=1&_t=ZS-98ZHQv6v7lV" class="w-10 h-10 rounded-xl bg-slate-800/50 flex items-center justify-center text-slate-400 hover:text-white hover:bg-blue-600/20 transition-all"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold text-sm mb-4">Layanan</h4>
+                    <ul class="space-y-3">
+                        <li><a href="armada.php" class="text-slate-500 text-sm hover:text-white transition-colors">Sewa Mobil</a></li>
+                        <li><a href="driver.php" class="text-slate-500 text-sm hover:text-white transition-colors">Sewa dengan Driver</a></li>
+<li><a href="wisata.php" class="text-slate-500 text-sm hover:text-white transition-colors">Paket Wisata</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold text-sm mb-4">Kontak</h4>
+                    <ul class="space-y-3">
+                        <li class="text-slate-500 text-sm flex items-start gap-2"><i class="fas fa-map-marker-alt mt-1 text-blue-500"></i> Jl. uka. Perumahan Graha Bintang Blok B 06, Pekanbaru, Riau</li>
+                        <li class="text-slate-500 text-sm flex items-center gap-2"><i class="fab fa-whatsapp text-green-500"></i> 0851-2154-0024</li>
+                        <li class="text-slate-500 text-sm flex items-center gap-2"><i class="fas fa-envelope text-yellow-500"></i> info@virgorentcar.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="section-divider mb-6"></div>
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-slate-600 text-xs">© 2025 Virgo Rent Car Pekanbaru. All rights reserved.</p>
+                <p class="text-slate-700 text-xs">Prototaip Aplikasi — Universitas Fort De Kock Bukittinggi</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==================== JAVASCRIPT DASAR ==================== -->
+    <script>
+        // Navbar Scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) { nav.classList.add('scrolled'); } else { nav.classList.remove('scrolled'); }
+        });
+
+        // Mobile Menu
+        document.getElementById('menuToggle')?.addEventListener('click', () => {
+            document.getElementById('mobileMenu').classList.add('active');
+        });
+        document.getElementById('menuClose')?.addEventListener('click', () => {
+            document.getElementById('mobileMenu').classList.remove('active');
+        });
+
+        // Fade up animation
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) { entry.target.classList.add('visible'); }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+        document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>

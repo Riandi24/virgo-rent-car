@@ -1,0 +1,23 @@
+# ============================================================
+# .htaccess (FOLDER UPLOADS) - Virgo Rent Car
+# Keamanan: Mencegah eksekusi file PHP di folder uploads
+# agar tidak ada yang bisa upload file berbahaya lalu dieksekusi
+# ============================================================
+
+# Blokir semua eksekusi file skrip di folder ini
+<FilesMatch "\.(php|phtml|php3|php4|php5|php7|php8|pl|py|cgi|asp|aspx|sh|cmd|bat)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Nonaktifkan penggunaan file .htaccess dalam folder ini
+<Files .htaccess>
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Izinkan akses ke file gambar saja
+<FilesMatch "\.(jpg|jpeg|png|gif|webp|avif|svg|ico)$">
+    Order allow,deny
+    Allow from all
+</FilesMatch>

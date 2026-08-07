@@ -1,0 +1,28 @@
+# ============================================================
+# .gitignore - Virgo Rent Car
+# File & folder yang TIDAK boleh di-upload ke GitHub
+# ============================================================
+
+# Folder arsip & dokumentasi internal
+_arsip/
+docs/
+sql/
+
+# Template koneksi hosting (berisi placeholder kredensial)
+koneksi_hosting.php
+
+# Panduan internal (khusus lokal)
+PANDUAN_LANGKAH_DEMI_LANGKAH.md
+PANDUAN_PUBLIKASI.md
+
+# File sistem & editor
+Thumbs.db
+Desktop.ini
+.vscode/
+.idea/
+*.log
+
+# File sementara
+*.tmp
+*~
+

@@ -1,0 +1,116 @@
+/* ============================================
+   VIRGO RENT CAR - Style Utama (Frontend)
+   Semua style dipisah dari header.php agar mudah diubah
+   ============================================ */
+
+/* ---------- Reset & Dasar ---------- */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', sans-serif; background: #060e1a; color: #e2e8f0; }
+
+/* ---------- Gradien ---------- */
+.grad-main { background: linear-gradient(135deg, #0D47A1 0%, #1565C0 25%, #2E7D32 50%, #43A047 75%, #F9A825 100%); }
+.grad-blue-green { background: linear-gradient(135deg, #0D47A1 0%, #1565C0 40%, #2E7D32 100%); }
+.grad-green-yellow { background: linear-gradient(135deg, #2E7D32 0%, #43A047 50%, #F9A825 100%); }
+.grad-blue-yellow { background: linear-gradient(135deg, #0D47A1 0%, #2E7D32 50%, #F9A825 100%); }
+.grad-text { background: linear-gradient(135deg, #42A5F5, #66BB6A, #FDD835); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.grad-text-soft { background: linear-gradient(135deg, #90CAF9, #A5D6A7, #FFF176); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+/* ---------- Hero ---------- */
+.hero-bg { background: linear-gradient(135deg, #0D47A1 0%, #0a2040 30%, #0a1628 60%, #0d1a10 80%, #1a1a0a 100%); position: relative; overflow: hidden; }
+.hero-bg::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(ellipse at 30% 20%, rgba(13,71,161,0.3) 0%, transparent 50%), radial-gradient(ellipse at 70% 60%, rgba(46,125,50,0.2) 0%, transparent 50%), radial-gradient(ellipse at 90% 30%, rgba(249,168,37,0.15) 0%, transparent 40%); animation: heroGlow 12s ease-in-out infinite alternate; }
+@keyframes heroGlow { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-5%, 3%) scale(1.1); } }
+
+/* ---------- Pattern & Judul ---------- */
+.grid-pattern { background-image: linear-gradient(rgba(66,165,245,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(66,165,245,0.05) 1px, transparent 1px); background-size: 60px 60px; }
+.hero-title { font-family: 'Playfair Display', serif; }
+.section-title { font-family: 'Playfair Display', serif; }
+
+/* ---------- Kartu ---------- */
+.card-glass { background: rgba(13, 22, 40, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(66, 165, 245, 0.1); border-radius: 20px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+.card-glass:hover { border-color: rgba(66, 165, 245, 0.3); transform: translateY(-8px); box-shadow: 0 25px 60px -15px rgba(13, 71, 161, 0.3), 0 0 40px rgba(46, 125, 50, 0.1); }
+
+/* ---------- Tombol ---------- */
+.btn-primary { background: linear-gradient(135deg, #0D47A1, #1565C0, #2E7D32); color: white; border: none; border-radius: 14px; padding: 14px 32px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+.btn-primary::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent); transition: left 0.5s ease; }
+.btn-primary:hover::before { left: 100%; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(13, 71, 161, 0.4); }
+.btn-secondary { background: linear-gradient(135deg, #2E7D32, #43A047, #F9A825); color: white; border: none; border-radius: 14px; padding: 14px 32px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+.btn-secondary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(46, 125, 50, 0.4); }
+.btn-yellow { background: linear-gradient(135deg, #F9A825, #FDD835); color: #0a1628; border: none; border-radius: 14px; padding: 14px 32px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; width: 100%; }
+.btn-yellow:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(249, 168, 37, 0.4); }
+
+/* ---------- Navbar ---------- */
+.navbar { background: rgba(6, 14, 26, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(66, 165, 245, 0.08); transition: all 0.3s ease; }
+.navbar.scrolled { background: rgba(6, 14, 26, 0.95); border-bottom-color: rgba(66, 165, 245, 0.15); }
+.nav-link { position: relative; color: #94a3b8; transition: color 0.3s ease; font-size: 13px; font-weight: 500; letter-spacing: 0.05em; text-decoration: none; }
+.nav-link:hover, .nav-link.active { color: #e2e8f0; }
+.nav-link::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background: linear-gradient(90deg, #42A5F5, #66BB6A); transition: width 0.3s ease; border-radius: 2px; }
+.nav-link:hover::after, .nav-link.active::after { width: 100%; }
+
+/* ---------- Pembatas & Form ---------- */
+.section-divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(66,165,245,0.3), rgba(102,187,106,0.3), rgba(253,216,53,0.3), transparent); }
+.form-input { background: rgba(13, 22, 40, 0.6); border: 1px solid rgba(66, 165, 245, 0.15); border-radius: 12px; padding: 14px 18px; color: #e2e8f0; font-size: 14px; width: 100%; transition: all 0.3s ease; outline: none; }
+.form-input:focus { border-color: rgba(66, 165, 245, 0.4); box-shadow: 0 0 20px rgba(13, 71, 161, 0.15); }
+.form-input::placeholder { color: #475569; }
+.form-label { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #94a3b8; margin-bottom: 8px; display: block; }
+
+/* ---------- Badge ---------- */
+.badge-blue { background: rgba(13, 71, 161, 0.2); color: #64B5F6; border: 1px solid rgba(13, 71, 161, 0.3); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.badge-green { background: rgba(46, 125, 50, 0.2); color: #81C784; border: 1px solid rgba(46, 125, 50, 0.3); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.badge-yellow { background: rgba(249, 168, 37, 0.2); color: #FFD54F; border: 1px solid rgba(249, 168, 37, 0.3); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+
+/* ---------- Harga & Animasi ---------- */
+.price-tag { background: linear-gradient(135deg, rgba(13,71,161,0.2), rgba(46,125,50,0.2)); border: 1px solid rgba(66,165,245,0.2); border-radius: 12px; padding: 10px 16px; }
+.fade-up { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+.fade-up.visible { opacity: 1; transform: translateY(0); }
+
+/* ---------- Mobile Menu ---------- */
+.mobile-menu { position: fixed; inset: 0; background: rgba(6, 14, 26, 0.98); backdrop-filter: blur(20px); z-index: 9998; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+.mobile-menu.active { opacity: 1; pointer-events: all; }
+.mobile-menu a { font-size: 24px; font-weight: 600; color: #e2e8f0; transition: color 0.3s ease; text-decoration: none; }
+.mobile-menu a:hover { color: #42A5F5; }
+
+/* ---------- Tombol Filter Armada ---------- */
+.tab-btn { background: rgba(13, 22, 40, 0.8); border: 1px solid rgba(66, 165, 245, 0.15); color: #94a3b8; padding: 10px 24px; border-radius: 999px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+.tab-btn:hover { border-color: rgba(66, 165, 245, 0.4); color: #e2e8f0; }
+.tab-btn.active-blue { background: linear-gradient(135deg, #0D47A1, #1565C0, #2E7D32); color: white; border-color: transparent; box-shadow: 0 8px 25px rgba(13, 71, 161, 0.4); }
+
+/* ---------- Rating Bintang (Ulasan) ---------- */
+.star-rating { display: inline-flex; gap: 6px; }
+.star-rating i { font-size: 30px; color: #475569; cursor: pointer; transition: transform 0.2s ease, color 0.2s ease; }
+.star-rating i:hover { transform: scale(1.2); }
+.star-rating i.text-yellow-400 { color: #FDD835; }
+
+/* Scrollbar halus untuk daftar ulasan */
+.review-scroll::-webkit-scrollbar { width: 6px; }
+.review-scroll::-webkit-scrollbar-track { background: rgba(13, 22, 40, 0.6); border-radius: 10px; }
+.review-scroll::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #0D47A1, #2E7D32); border-radius: 10px; }
+
+/* ============================================
+   TESTIMONI BERANDA (Review & Rating)
+   ============================================ */
+.testimonial-title { font-family: 'Playfair Display', serif; }
+
+/* Kartu testimoni */
+.testimonial-card { position: relative; overflow: hidden; }
+.testimonial-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #0D47A1, #2E7D32, #F9A825); }
+.testimonial-card .quote-icon { font-size: 2.5rem; color: rgba(249, 168, 37, 0.25); line-height: 1; }
+
+/* Foto avatar */
+.testimonial-avatar { width: 3rem; height: 3rem; border-radius: 9999px; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff; font-size: 1rem; flex-shrink: 0; }
+
+/* Rating distribution bar */
+.rating-bar-track { background: rgba(148, 163, 184, 0.15); border-radius: 999px; height: 8px; overflow: hidden; flex: 1; }
+.rating-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #FDD835, #F9A825); transition: width 1s ease; }
+
+/* Avg rating besar */
+.avg-rating-hero { font-size: 4.5rem; font-weight: 800; line-height: 1; background: linear-gradient(135deg, #42A5F5, #66BB6A, #FDD835); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+/* Tombol navigasi carousel testimoni */
+.testimonial-nav { width: 2.75rem; height: 2.75rem; border-radius: 9999px; background: rgba(13, 22, 40, 0.8); border: 1px solid rgba(66, 165, 245, 0.2); color: #94a3b8; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; }
+.testimonial-nav:hover { border-color: rgba(66, 165, 245, 0.5); color: #fff; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(13, 71, 161, 0.3); }
+
+/* ---------- Responsif ---------- */
+@media (max-width: 768px) { .hero-title { font-size: 36px !important; } .section-title { font-size: 28px !important; } .avg-rating-hero { font-size: 3.5rem; } }
+
