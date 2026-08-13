@@ -9,8 +9,19 @@ $rata_rata = 0;
 $rating_distribution = array(5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0);
 
 $cek_tabel = mysqli_query($koneksi, "SHOW TABLES LIKE 'tbl_reviews'");
+// Cek apakah kolom status sudah ada (untuk kompatibilitas versi lama)
+$kolom_status_ada = false;
 if ($cek_tabel && mysqli_num_rows($cek_tabel) > 0) {
-    $query_avg = "SELECT COUNT(*) AS total_review, COALESCE(AVG(rating), 0) AS rata_rata FROM tbl_reviews";
+    $cek_kolom = mysqli_query($koneksi, "SHOW COLUMNS FROM tbl_reviews LIKE 'status'");
+    if ($cek_kolom && mysqli_num_rows($cek_kolom) > 0) {
+        $kolom_status_ada = true;
+    }
+}
+if ($cek_tabel && mysqli_num_rows($cek_tabel) > 0) {
+    // Filter hanya ulasan Approved (jika kolom status ada)
+    $filter_status = $kolom_status_ada ? "WHERE r.status = 'Approved'" : "";
+
+    $query_avg = "SELECT COUNT(*) AS total_review, COALESCE(AVG(rating), 0) AS rata_rata FROM tbl_reviews r $filter_status";
     $result_avg = mysqli_query($koneksi, $query_avg);
     if ($result_avg) {
         $avg_data = mysqli_fetch_assoc($result_avg);
@@ -18,8 +29,8 @@ if ($cek_tabel && mysqli_num_rows($cek_tabel) > 0) {
         $rata_rata = round(floatval($avg_data['rata_rata']), 1);
     }
 
-    // Distribusi rating (jumlah per bintang)
-    $query_dist = "SELECT rating, COUNT(*) AS jumlah FROM tbl_reviews GROUP BY rating";
+    // Distribusi rating (jumlah per bintang - approved only)
+    $query_dist = "SELECT rating, COUNT(*) AS jumlah FROM tbl_reviews r $filter_status GROUP BY rating";
     $result_dist = mysqli_query($koneksi, $query_dist);
     if ($result_dist) {
         while ($d = mysqli_fetch_assoc($result_dist)) {
@@ -27,10 +38,11 @@ if ($cek_tabel && mysqli_num_rows($cek_tabel) > 0) {
         }
     }
 
-    // Ambil 6 ulasan terbaru
-    $query_reviews = "SELECT r.*, k.nama_mobil
+    // Ambil 6 ulasan terbaru (approved only) + foto mobil
+    $query_reviews = "SELECT r.*, k.nama_mobil, k.gambar AS mobil_gambar
                       FROM tbl_reviews r
                       LEFT JOIN tbl_kendaraan k ON r.id_kendaraan = k.id_kendaraan
+                      $filter_status
                       ORDER BY r.tanggal DESC
                       LIMIT 6";
     $result_reviews = mysqli_query($koneksi, $query_reviews);
@@ -58,14 +70,14 @@ function renderHomeStars($rating) {
 
 <!-- ==================== HERO ==================== -->
 <section class="hero-bg min-h-[80vh] flex items-center relative" id="hero">
-    <div class="max-w-7xl mx-auto px-6 py-20 w-full relative z-10">
-        <div class="grid lg:grid-cols-2 gap-16 items-center">
+    <div class="max-w-7xl mx-auto px-6 py-16 md:py-20 w-full relative z-10">
+        <div class="grid lg:grid-cols-2 gap-12 md:gap-16 items-center">
             <div>
-                <div class="flex items-center gap-3 mb-8 fade-up">
+                <div class="flex items-center gap-3 mb-6 md:mb-8 fade-up">
                     <div class="badge-blue"><i class="fas fa-map-marker-alt mr-1"></i> Pekanbaru, Riau</div>
                     <div class="badge-green">Tersedia 24/7</div>
                 </div>
-                <h1 class="hero-title font-serif text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.05] tracking-tight mb-6 fade-up" style="transition-delay:0.1s">
+                <h1 class="hero-title font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-[1.05] tracking-tight mb-5 md:mb-6 fade-up" style="transition-delay:0.1s">
                     Solusi Rental<br>
                     <span class="grad-text">Mobil Terpercaya</span><br>
                     di Pekanbaru
@@ -110,12 +122,12 @@ function renderHomeStars($rating) {
                         </div>
                     </div>
                 </div>
-                <div class="absolute -top-4 -right-4 card-glass p-5 rounded-2xl">
+<div class="absolute -top-4 -right-4 card-glass p-5 rounded-2xl">
                     <div class="flex items-center gap-3">
                         <div class="w-12 h-12 rounded-xl grad-blue-green flex items-center justify-center"><i class="fas fa-star text-white"></i></div>
                         <div>
                             <div class="text-white font-semibold text-sm">Rating 4.9</div>
-                            <div class="text-slate-400 text-xs">Google Reviews</div>
+                            <div class="text-slate-400 text-xs">Ulasan Pelanggan</div>
                         </div>
                     </div>
                 </div>
@@ -129,8 +141,8 @@ function renderHomeStars($rating) {
 <!-- ==================== KEUNGGULAN ==================== -->
 <section class="py-24">
     <div class="max-w-7xl mx-auto px-6">
-        <div class="text-center mb-16 fade-up">
-            <h2 class="section-title font-serif text-4xl md:text-5xl font-bold text-white mb-4">
+        <div class="text-center mb-12 md:mb-16 fade-up">
+            <h2 class="section-title font-serif text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
                 Mengapa <span class="grad-text">Virgo Rent Car</span>?
             </h2>
         </div>
@@ -171,12 +183,12 @@ function renderHomeStars($rating) {
     </div>
 
     <div class="max-w-7xl mx-auto px-6 relative">
-        <!-- Section Header -->
-        <div class="text-center mb-16 fade-up">
+<!-- Section Header -->
+        <div class="text-center mb-12 md:mb-16 fade-up">
             <div class="badge-yellow inline-flex items-center gap-2 mb-4">
                 <i class="fas fa-star"></i> TESTIMONI PELANGGAN
             </div>
-            <h2 class="section-title font-serif text-4xl md:text-5xl font-bold text-white mb-4">
+            <h2 class="section-title font-serif text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
                 Apa Kata <span class="grad-text">Mereka</span>?
             </h2>
             <p class="text-slate-400 max-w-xl mx-auto text-sm leading-relaxed">
@@ -232,8 +244,19 @@ function renderHomeStars($rating) {
 
         <!-- ===== Grid Testimoni ===== -->
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <?php foreach ($reviews_data as $review): ?>
+<?php foreach ($reviews_data as $review): ?>
             <div class="card-glass testimonial-card p-6 flex flex-col fade-up">
+                <?php if (!empty($review['mobil_gambar'])): ?>
+                <!-- Foto mobil -->
+                <div class="relative h-32 rounded-xl overflow-hidden mb-4">
+                    <img src="uploads/<?= htmlspecialchars($review['mobil_gambar']); ?>" alt="<?= htmlspecialchars($review['nama_mobil'] ?? 'Mobil'); ?>" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-virgo-darker/70 to-transparent"></div>
+                    <div class="absolute bottom-2 left-3 flex items-center gap-2">
+                        <i class="fas fa-car text-yellow-400"></i>
+                        <span class="text-white text-xs font-semibold"><?= htmlspecialchars($review['nama_mobil'] ?? 'Rental Mobil'); ?></span>
+                    </div>
+                </div>
+                <?php endif; ?>
                 <div class="flex items-center justify-between mb-4">
                     <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
                     <div class="flex gap-1"><?= renderHomeStars($review['rating']); ?></div>
@@ -241,7 +264,7 @@ function renderHomeStars($rating) {
                 <p class="text-slate-400 text-sm leading-relaxed flex-1 mb-6">
                     <?= nl2br(htmlspecialchars(mb_substr($review['komentar'], 0, 180))); ?><?= mb_strlen($review['komentar']) > 180 ? '…' : ''; ?>
                 </p>
-                <div class="flex items-center gap-3 pt-4 border-t border-slate-800/50">
+<div class="flex items-center gap-3 pt-4 border-t border-slate-800/50">
                     <div class="testimonial-avatar grad-blue-green"><?= htmlspecialchars(strtoupper(substr($review['nama_pelanggan'], 0, 1))); ?></div>
                     <div class="min-w-0">
                         <div class="text-white font-semibold text-sm truncate"><?= htmlspecialchars($review['nama_pelanggan']); ?></div>

@@ -1,9 +1,18 @@
 <?php
 require 'auth_check.php'; // proteksi sesi + timeout + single session (mencegah bypass URL)
 require_once '../koneksi.php';
+require_once 'csrf.php';
+
+// Upload validation settings
+$MAX_UPLOAD_BYTES = 2 * 1024 * 1024; // 2MB
+$ALLOWED_MIMES = ['image/jpeg','image/png','image/webp'];
 
 // PROSES TAMBAH / EDIT MOBIL
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
+        die('CSRF token invalid.');
+    }
+
     $id = intval($_POST['id_kendaraan']);
     $nama_mobil = mysqli_real_escape_string($koneksi, $_POST['nama_mobil']);
     $kategori = mysqli_real_escape_string($koneksi, $_POST['kategori']);
@@ -16,18 +25,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $nama_file_gambar = $gambar_lama;
     if (isset($_FILES['gambar']) && $_FILES['gambar']['error'] == 0) {
+        if ($_FILES['gambar']['size'] > $MAX_UPLOAD_BYTES) {
+            die('Ukuran file terlalu besar (maks 2MB).');
+        }
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mime = $finfo->file($_FILES['gambar']['tmp_name']);
+        if (!in_array($mime, $ALLOWED_MIMES)) {
+            die('Tipe file tidak diperbolehkan.');
+        }
+        $ext = pathinfo($_FILES['gambar']['name'], PATHINFO_EXTENSION);
+        $ext = strtolower($ext);
+        if ($mime === 'image/jpeg') $ext = 'jpg';
+        if ($mime === 'image/png') $ext = 'png';
+        if ($mime === 'image/webp') $ext = 'webp';
         $target_dir = "../uploads/";
-        $ext = strtolower(pathinfo($_FILES['gambar']['name'], PATHINFO_EXTENSION));
         $nama_file_gambar = uniqid('mobil_') . '.' . $ext;
-        move_uploaded_file($_FILES['gambar']['tmp_name'], $target_dir . $nama_file_gambar);
+        if (!move_uploaded_file($_FILES['gambar']['tmp_name'], $target_dir . $nama_file_gambar)) {
+            die('Gagal menyimpan file gambar.');
+        }
     }
 
     if ($id > 0) {
-        $query = "UPDATE tbl_kendaraan SET nama_mobil='$nama_mobil', kategori='$kategori', transmisi='$transmisi', bahan_bakar='$bahan_bakar', kapasitas_kursi=$kapasitas, harga_sewa=$harga, status='$status', gambar='$nama_file_gambar' WHERE id_kendaraan=$id";
+        $stmt = $koneksi->prepare("UPDATE tbl_kendaraan SET nama_mobil = ?, kategori = ?, transmisi = ?, bahan_bakar = ?, kapasitas_kursi = ?, harga_sewa = ?, status = ?, gambar = ? WHERE id_kendaraan = ?");
+        $stmt->bind_param("ssssiissi", $nama_mobil, $kategori, $transmisi, $bahan_bakar, $kapasitas, $harga, $status, $nama_file_gambar, $id);
+        $stmt->execute();
+        $stmt->close();
     } else {
-        $query = "INSERT INTO tbl_kendaraan (nama_mobil, kategori, transmisi, bahan_bakar, kapasitas_kursi, harga_sewa, status, gambar) VALUES ('$nama_mobil', '$kategori', '$transmisi', '$bahan_bakar', $kapasitas, $harga, '$status', '$nama_file_gambar')";
+        $stmt = $koneksi->prepare("INSERT INTO tbl_kendaraan (nama_mobil, kategori, transmisi, bahan_bakar, kapasitas_kursi, harga_sewa, status, gambar) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssssiiss", $nama_mobil, $kategori, $transmisi, $bahan_bakar, $kapasitas, $harga, $status, $nama_file_gambar);
+        $stmt->execute();
+        $stmt->close();
     }
-    mysqli_query($koneksi, $query);
     header("Location: kelola_mobil.php");
     exit();
 }
@@ -35,12 +63,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 // PROSES HAPUS MOBIL
 if (isset($_GET['hapus'])) {
     $id_hapus = intval($_GET['hapus']);
-    $res = mysqli_query($koneksi, "SELECT gambar FROM tbl_kendaraan WHERE id_kendaraan=$id_hapus");
-    $data = mysqli_fetch_assoc($res);
+    $stmt = $koneksi->prepare("SELECT gambar FROM tbl_kendaraan WHERE id_kendaraan = ?");
+    $stmt->bind_param("i", $id_hapus);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    $data = $res->fetch_assoc();
+    $stmt->close();
     if ($data && $data['gambar'] && file_exists("../uploads/".$data['gambar'])) {
         unlink("../uploads/".$data['gambar']);
     }
-    mysqli_query($koneksi, "DELETE FROM tbl_kendaraan WHERE id_kendaraan=$id_hapus");
+    $stmt = $koneksi->prepare("DELETE FROM tbl_kendaraan WHERE id_kendaraan = ?");
+    $stmt->bind_param("i", $id_hapus);
+    $stmt->execute();
+    $stmt->close();
     header("Location: kelola_mobil.php");
     exit();
 }
@@ -83,6 +118,7 @@ if (isset($_GET['edit'])) {
             <form method="POST" action="" enctype="multipart/form-data" class="grid md:grid-cols-2 gap-5">
                 <input type="hidden" name="id_kendaraan" value="<?= $data_edit['id_kendaraan'] ?? 0; ?>">
                 <input type="hidden" name="gambar_lama" value="<?= $data_edit['gambar'] ?? ''; ?>">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generate_csrf_token()); ?>">
                 
                 <div>
                     <label class="block text-slate-400 text-sm font-semibold mb-2">Nama Mobil</label>

@@ -39,15 +39,15 @@ function isActive($page) {
 <body class="grid-pattern">
 
     <!-- ==================== NAVBAR ==================== -->
-    <nav class="navbar fixed top-0 left-0 right-0 z-[9999]" id="navbar">
-        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-            <a href="index.php" class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl grad-blue-green flex items-center justify-center">
-                    <i class="fas fa-car text-white text-lg"></i>
+<nav class="navbar fixed top-0 left-0 right-0 z-[9999]" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between">
+            <a href="index.php" class="flex items-center gap-2 md:gap-3">
+                <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl grad-blue-green flex items-center justify-center">
+                    <i class="fas fa-car text-white text-sm md:text-lg"></i>
                 </div>
                 <div>
-                    <span class="text-white font-bold text-lg tracking-tight">VIRGO</span>
-                    <span class="text-slate-400 font-light text-lg ml-1">Rent Car</span>
+                    <span class="text-white font-bold text-base md:text-lg tracking-tight">VIRGO</span>
+                    <span class="text-slate-400 font-light text-sm md:text-lg ml-1">Rent Car</span>
                 </div>
             </a>
             <div class="hidden md:flex items-center gap-8">
@@ -90,5 +90,5 @@ function isActive($page) {
         </a>
     </div>
     
-    <!-- Spacer agar konten tidak ketutup navbar fixed -->
-    <div class="h-20"></div>
+<!-- Spacer agar konten tidak ketutup navbar fixed -->
+    <div class="h-16 md:h-20"></div>
