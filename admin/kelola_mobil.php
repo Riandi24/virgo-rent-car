@@ -1,18 +1,9 @@
 <?php
 require 'auth_check.php'; // proteksi sesi + timeout + single session (mencegah bypass URL)
 require_once '../koneksi.php';
-require_once 'csrf.php';
-
-// Upload validation settings
-$MAX_UPLOAD_BYTES = 2 * 1024 * 1024; // 2MB
-$ALLOWED_MIMES = ['image/jpeg','image/png','image/webp'];
 
 // PROSES TAMBAH / EDIT MOBIL
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
-        die('CSRF token invalid.');
-    }
-
     $id = intval($_POST['id_kendaraan']);
     $nama_mobil = mysqli_real_escape_string($koneksi, $_POST['nama_mobil']);
     $kategori = mysqli_real_escape_string($koneksi, $_POST['kategori']);
@@ -25,57 +16,71 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $nama_file_gambar = $gambar_lama;
     if (isset($_FILES['gambar']) && $_FILES['gambar']['error'] == 0) {
-        if ($_FILES['gambar']['size'] > $MAX_UPLOAD_BYTES) {
-            die('Ukuran file terlalu besar (maks 2MB).');
-        }
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
-        $mime = $finfo->file($_FILES['gambar']['tmp_name']);
-        if (!in_array($mime, $ALLOWED_MIMES)) {
-            die('Tipe file tidak diperbolehkan.');
-        }
-        $ext = pathinfo($_FILES['gambar']['name'], PATHINFO_EXTENSION);
-        $ext = strtolower($ext);
-        if ($mime === 'image/jpeg') $ext = 'jpg';
-        if ($mime === 'image/png') $ext = 'png';
-        if ($mime === 'image/webp') $ext = 'webp';
         $target_dir = "../uploads/";
+        $ext = strtolower(pathinfo($_FILES['gambar']['name'], PATHINFO_EXTENSION));
         $nama_file_gambar = uniqid('mobil_') . '.' . $ext;
-        if (!move_uploaded_file($_FILES['gambar']['tmp_name'], $target_dir . $nama_file_gambar)) {
-            die('Gagal menyimpan file gambar.');
-        }
+        move_uploaded_file($_FILES['gambar']['tmp_name'], $target_dir . $nama_file_gambar);
     }
 
     if ($id > 0) {
-        $stmt = $koneksi->prepare("UPDATE tbl_kendaraan SET nama_mobil = ?, kategori = ?, transmisi = ?, bahan_bakar = ?, kapasitas_kursi = ?, harga_sewa = ?, status = ?, gambar = ? WHERE id_kendaraan = ?");
-        $stmt->bind_param("ssssiissi", $nama_mobil, $kategori, $transmisi, $bahan_bakar, $kapasitas, $harga, $status, $nama_file_gambar, $id);
-        $stmt->execute();
-        $stmt->close();
+        $query = "UPDATE tbl_kendaraan SET nama_mobil='$nama_mobil', kategori='$kategori', transmisi='$transmisi', bahan_bakar='$bahan_bakar', kapasitas_kursi=$kapasitas, harga_sewa=$harga, status='$status', gambar='$nama_file_gambar' WHERE id_kendaraan=$id";
     } else {
-        $stmt = $koneksi->prepare("INSERT INTO tbl_kendaraan (nama_mobil, kategori, transmisi, bahan_bakar, kapasitas_kursi, harga_sewa, status, gambar) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssssiiss", $nama_mobil, $kategori, $transmisi, $bahan_bakar, $kapasitas, $harga, $status, $nama_file_gambar);
-        $stmt->execute();
-        $stmt->close();
+        $query = "INSERT INTO tbl_kendaraan (nama_mobil, kategori, transmisi, bahan_bakar, kapasitas_kursi, harga_sewa, status, gambar) VALUES ('$nama_mobil', '$kategori', '$transmisi', '$bahan_bakar', $kapasitas, $harga, '$status', '$nama_file_gambar')";
     }
-    header("Location: kelola_mobil.php");
+    mysqli_query($koneksi, $query);
+    if ($id == 0) $id = mysqli_insert_id($koneksi);
+
+    // Upload foto tambahan (galeri interior/eksterior), maksimal 5 file per submit
+    if (!empty($_FILES['foto_tambahan']['name'][0])) {
+        $dir_foto = "../uploads/mobil/";
+        if (!is_dir($dir_foto)) mkdir($dir_foto, 0777, true);
+        $ext_valid = ['jpg', 'jpeg', 'png', 'webp'];
+        $jumlah = min(count($_FILES['foto_tambahan']['name']), 5);
+        $stmt_foto = mysqli_prepare($koneksi, "INSERT INTO tbl_kendaraan_foto (id_kendaraan, foto_path) VALUES (?, ?)");
+        for ($i = 0; $i < $jumlah; $i++) {
+            if ($_FILES['foto_tambahan']['error'][$i] != 0) continue;
+            $ext = strtolower(pathinfo($_FILES['foto_tambahan']['name'][$i], PATHINFO_EXTENSION));
+            if (!in_array($ext, $ext_valid) || $_FILES['foto_tambahan']['size'][$i] > 5 * 1024 * 1024) continue;
+            $nama_foto = 'mobil_' . time() . '_' . $i . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+            if (move_uploaded_file($_FILES['foto_tambahan']['tmp_name'][$i], $dir_foto . $nama_foto)) {
+                $path_db = 'mobil/' . $nama_foto;
+                mysqli_stmt_bind_param($stmt_foto, "is", $id, $path_db);
+                mysqli_stmt_execute($stmt_foto);
+            }
+        }
+        mysqli_stmt_close($stmt_foto);
+    }
+    header("Location: kelola_mobil.php?edit=$id");
+    exit();
+}
+
+// PROSES HAPUS SATU FOTO TAMBAHAN
+if (isset($_GET['hapus_foto'])) {
+    $id_foto = intval($_GET['hapus_foto']);
+    $res = mysqli_query($koneksi, "SELECT foto_path FROM tbl_kendaraan_foto WHERE id_foto=$id_foto");
+    $foto = mysqli_fetch_assoc($res);
+    if ($foto && file_exists("../uploads/" . $foto['foto_path'])) {
+        unlink("../uploads/" . $foto['foto_path']);
+    }
+    mysqli_query($koneksi, "DELETE FROM tbl_kendaraan_foto WHERE id_foto=$id_foto");
+    header("Location: kelola_mobil.php?edit=" . intval($_GET['id_mobil']));
     exit();
 }
 
 // PROSES HAPUS MOBIL
 if (isset($_GET['hapus'])) {
     $id_hapus = intval($_GET['hapus']);
-    $stmt = $koneksi->prepare("SELECT gambar FROM tbl_kendaraan WHERE id_kendaraan = ?");
-    $stmt->bind_param("i", $id_hapus);
-    $stmt->execute();
-    $res = $stmt->get_result();
-    $data = $res->fetch_assoc();
-    $stmt->close();
+    $res = mysqli_query($koneksi, "SELECT gambar FROM tbl_kendaraan WHERE id_kendaraan=$id_hapus");
+    $data = mysqli_fetch_assoc($res);
     if ($data && $data['gambar'] && file_exists("../uploads/".$data['gambar'])) {
         unlink("../uploads/".$data['gambar']);
     }
-    $stmt = $koneksi->prepare("DELETE FROM tbl_kendaraan WHERE id_kendaraan = ?");
-    $stmt->bind_param("i", $id_hapus);
-    $stmt->execute();
-    $stmt->close();
+    // Hapus juga semua file foto tambahan milik mobil ini
+    $res_foto = mysqli_query($koneksi, "SELECT foto_path FROM tbl_kendaraan_foto WHERE id_kendaraan=$id_hapus");
+    while ($f = mysqli_fetch_assoc($res_foto)) {
+        if (file_exists("../uploads/" . $f['foto_path'])) unlink("../uploads/" . $f['foto_path']);
+    }
+    mysqli_query($koneksi, "DELETE FROM tbl_kendaraan WHERE id_kendaraan=$id_hapus");
     header("Location: kelola_mobil.php");
     exit();
 }
@@ -86,6 +91,11 @@ if (isset($_GET['edit'])) {
     $id_edit = intval($_GET['edit']);
     $res_edit = mysqli_query($koneksi, "SELECT * FROM tbl_kendaraan WHERE id_kendaraan=$id_edit");
     if (mysqli_num_rows($res_edit) > 0) $data_edit = mysqli_fetch_assoc($res_edit);
+}
+$foto_edit = [];
+if ($data_edit) {
+    $res_foto = mysqli_query($koneksi, "SELECT * FROM tbl_kendaraan_foto WHERE id_kendaraan=" . intval($data_edit['id_kendaraan']) . " ORDER BY id_foto ASC");
+    while ($f = mysqli_fetch_assoc($res_foto)) $foto_edit[] = $f;
 }
 ?>
 <!DOCTYPE html>
@@ -118,7 +128,6 @@ if (isset($_GET['edit'])) {
             <form method="POST" action="" enctype="multipart/form-data" class="grid md:grid-cols-2 gap-5">
                 <input type="hidden" name="id_kendaraan" value="<?= $data_edit['id_kendaraan'] ?? 0; ?>">
                 <input type="hidden" name="gambar_lama" value="<?= $data_edit['gambar'] ?? ''; ?>">
-                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generate_csrf_token()); ?>">
                 
                 <div>
                     <label class="block text-slate-400 text-sm font-semibold mb-2">Nama Mobil</label>
@@ -168,7 +177,27 @@ if (isset($_GET['edit'])) {
                     <?php if(isset($data_edit['gambar']) && $data_edit['gambar']): ?>
                         <div class="mt-3 flex items-center gap-3">
                             <img src="../uploads/<?= $data_edit['gambar']; ?>" class="w-24 h-24 object-cover rounded-xl">
-                            <span class="text-xs text-slate-500">Gambar saat ini. Biarkan kosong jika tidak ingin ganti.</span>
+                            <span class="text-xs text-slate-500">Gambar utama (thumbnail). Biarkan kosong jika tidak ingin ganti.</span>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-slate-400 text-sm font-semibold mb-2">Foto Galeri Tambahan (Maks. 5: interior, dll — JPG/PNG/WebP)</label>
+                    <input type="file" name="foto_tambahan[]" class="form-input" accept="image/jpeg,image/png,image/webp" multiple>
+                    <span class="text-xs text-slate-500 block mt-1">Tampil di halaman Armada saat pelanggan klik gambar mobil. Pelanggan dapat melihat interior mobil.</span>
+                    <?php if(!empty($foto_edit)): ?>
+                        <div class="mt-3">
+                            <p class="text-xs text-slate-500 mb-2">Foto galeri saat ini (klik tombol merah untuk hapus):</p>
+                            <div class="flex flex-wrap gap-3">
+                                <?php foreach($foto_edit as $f): ?>
+                                    <div class="relative group">
+                                        <img src="../uploads/<?= htmlspecialchars($f['foto_path']); ?>" class="w-20 h-20 object-cover rounded-xl border border-slate-700">
+                                        <a href="kelola_mobil.php?hapus_foto=<?= $f['id_foto']; ?>&id_mobil=<?= $data_edit['id_kendaraan']; ?>"
+                                           class="absolute -top-2 -right-2 w-6 h-6 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center text-xs"
+                                           onclick="return confirm('Hapus foto ini?')"><i class="fas fa-times"></i></a>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
                         </div>
                     <?php endif; ?>
                 </div>

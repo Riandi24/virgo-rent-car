@@ -3,11 +3,11 @@
 <!-- ==================== DRIVER ==================== -->
 <section class="py-24 relative" id="driver">
     <div class="max-w-7xl mx-auto px-6">
-        <div class="text-center mb-12 md:mb-16 fade-up">
+        <div class="text-center mb-16 fade-up">
             <div class="badge-yellow inline-flex items-center gap-2 mb-4">
                 <i class="fas fa-id-card-alt"></i> DRIVER KAMI
             </div>
-            <h2 class="section-title font-serif text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
+            <h2 class="section-title font-serif text-4xl md:text-5xl font-bold text-white mb-4">
                 Pilih <span class="grad-text">Driver</span> Andalan
             </h2>
             <p class="text-slate-400 max-w-xl mx-auto text-sm leading-relaxed">

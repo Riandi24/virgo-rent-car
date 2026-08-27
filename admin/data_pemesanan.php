@@ -10,18 +10,15 @@ if(isset($_GET['action']) && isset($_GET['id'])) {
     $action = $_GET['action'];
     
     // Ambil data reservasi untuk notifikasi (LEFT JOIN agar pemesanan wisata tanpa mobil tetap terbaca)
-    $stmt = $koneksi->prepare("SELECT r.*, k.nama_mobil, w.nama_paket, r.id_kendaraan FROM tbl_reservasi r LEFT JOIN tbl_kendaraan k ON r.id_kendaraan = k.id_kendaraan LEFT JOIN tbl_wisata w ON r.id_wisata = w.id_wisata WHERE r.id_reservasi = ?");
-    $stmt->bind_param("i", $id_reservasi);
-    $stmt->execute();
-    $res_notif = $stmt->get_result();
-    $data_notif = $res_notif->fetch_assoc();
-    $stmt->close();
-
+    $res_notif = mysqli_query($koneksi, "SELECT r.*, k.nama_mobil, w.nama_paket 
+                                         FROM tbl_reservasi r 
+                                         LEFT JOIN tbl_kendaraan k ON r.id_kendaraan = k.id_kendaraan 
+                                         LEFT JOIN tbl_wisata w ON r.id_wisata = w.id_wisata 
+                                         WHERE r.id_reservasi = $id_reservasi");
+    $data_notif = mysqli_fetch_assoc($res_notif);
+    
     if($action == 'konfirmasi') {
-        $stmt = $koneksi->prepare("UPDATE tbl_reservasi SET status_reservasi = 'Dikonfirmasi' WHERE id_reservasi = ?");
-        $stmt->bind_param("i", $id_reservasi);
-        $stmt->execute();
-        $stmt->close();
+        mysqli_query($koneksi, "UPDATE tbl_reservasi SET status_reservasi='Dikonfirmasi' WHERE id_reservasi=$id_reservasi");
         
         // Notifikasi WA ke pelanggan: redirect ke index dengan parameter wa_konfirmasi
         $wa_number_user = preg_replace('/^0/', '62', $data_notif['no_wa']);
@@ -44,31 +41,17 @@ if(isset($_GET['action']) && isset($_GET['id'])) {
     } elseif($action == 'selesai') {
         // Kembalikan status mobil ke Tersedia (jika pemesanan memakai mobil)
         if (!empty($data_notif['id_kendaraan'])) {
-            $id_kendaraan_var = intval($data_notif['id_kendaraan']);
-            $stmt = $koneksi->prepare("UPDATE tbl_kendaraan SET status = 'Tersedia' WHERE id_kendaraan = ?");
-            $stmt->bind_param("i", $id_kendaraan_var);
-            $stmt->execute();
-            $stmt->close();
+            mysqli_query($koneksi, "UPDATE tbl_kendaraan SET status='Tersedia' WHERE id_kendaraan=" . $data_notif['id_kendaraan']);
         }
-        $stmt = $koneksi->prepare("UPDATE tbl_reservasi SET status_reservasi = 'Selesai' WHERE id_reservasi = ?");
-        $stmt->bind_param("i", $id_reservasi);
-        $stmt->execute();
-        $stmt->close();
+        mysqli_query($koneksi, "UPDATE tbl_reservasi SET status_reservasi='Selesai' WHERE id_reservasi=$id_reservasi");
         header("Location: data_pemesanan.php");
         exit();
     } elseif($action == 'batal') {
         // Kembalikan status mobil ke Tersedia (jika pemesanan memakai mobil)
         if (!empty($data_notif['id_kendaraan'])) {
-            $id_kendaraan_var = intval($data_notif['id_kendaraan']);
-            $stmt = $koneksi->prepare("UPDATE tbl_kendaraan SET status = 'Tersedia' WHERE id_kendaraan = ?");
-            $stmt->bind_param("i", $id_kendaraan_var);
-            $stmt->execute();
-            $stmt->close();
+            mysqli_query($koneksi, "UPDATE tbl_kendaraan SET status='Tersedia' WHERE id_kendaraan=" . $data_notif['id_kendaraan']);
         }
-        $stmt = $koneksi->prepare("UPDATE tbl_reservasi SET status_reservasi = 'Dibatalkan' WHERE id_reservasi = ?");
-        $stmt->bind_param("i", $id_reservasi);
-        $stmt->execute();
-        $stmt->close();
+        mysqli_query($koneksi, "UPDATE tbl_reservasi SET status_reservasi='Dibatalkan' WHERE id_reservasi=$id_reservasi");
         header("Location: data_pemesanan.php");
         exit();
     }

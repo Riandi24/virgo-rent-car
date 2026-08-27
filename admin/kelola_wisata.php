@@ -1,17 +1,8 @@
 <?php
 require 'auth_check.php'; // proteksi sesi + timeout + single session (mencegah bypass URL)
 require_once '../koneksi.php';
-require_once 'csrf.php';
-
-// Upload validation settings
-$MAX_UPLOAD_BYTES = 2 * 1024 * 1024; // 2MB
-$ALLOWED_MIMES = ['image/jpeg','image/png','image/webp'];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
-        die('CSRF token invalid.');
-    }
-
     $id = intval($_POST['id_wisata']);
     $nama_paket = mysqli_real_escape_string($koneksi, $_POST['nama_paket']);
     $durasi = mysqli_real_escape_string($koneksi, $_POST['durasi']);
@@ -20,56 +11,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $nama_file_gambar = $gambar_lama;
     if (isset($_FILES['gambar']) && $_FILES['gambar']['error'] == 0) {
-        if ($_FILES['gambar']['size'] > $MAX_UPLOAD_BYTES) {
-            die('Ukuran file terlalu besar (maks 2MB).');
-        }
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
-        $mime = $finfo->file($_FILES['gambar']['tmp_name']);
-        if (!in_array($mime, $ALLOWED_MIMES)) {
-            die('Tipe file tidak diperbolehkan.');
-        }
-        $ext = pathinfo($_FILES['gambar']['name'], PATHINFO_EXTENSION);
-        $ext = strtolower($ext);
-        if ($mime === 'image/jpeg') $ext = 'jpg';
-        if ($mime === 'image/png') $ext = 'png';
-        if ($mime === 'image/webp') $ext = 'webp';
         $target_dir = "../uploads/";
+        $ext = strtolower(pathinfo($_FILES['gambar']['name'], PATHINFO_EXTENSION));
         $nama_file_gambar = uniqid('wisata_') . '.' . $ext;
-        if (!move_uploaded_file($_FILES['gambar']['tmp_name'], $target_dir . $nama_file_gambar)) {
-            die('Gagal menyimpan file gambar.');
-        }
+        move_uploaded_file($_FILES['gambar']['tmp_name'], $target_dir . $nama_file_gambar);
     }
 
     if ($id > 0) {
-        $stmt = $koneksi->prepare("UPDATE tbl_wisata SET nama_paket = ?, durasi = ?, harga = ?, gambar = ? WHERE id_wisata = ?");
-        $stmt->bind_param("ssisi", $nama_paket, $durasi, $harga, $nama_file_gambar, $id);
-        $stmt->execute();
-        $stmt->close();
+        $query = "UPDATE tbl_wisata SET nama_paket='$nama_paket', durasi='$durasi', harga=$harga, gambar='$nama_file_gambar' WHERE id_wisata=$id";
     } else {
-        $stmt = $koneksi->prepare("INSERT INTO tbl_wisata (nama_paket, durasi, harga, gambar) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssis", $nama_paket, $durasi, $harga, $nama_file_gambar);
-        $stmt->execute();
-        $stmt->close();
+        $query = "INSERT INTO tbl_wisata (nama_paket, durasi, harga, gambar) VALUES ('$nama_paket', '$durasi', $harga, '$nama_file_gambar')";
     }
+    mysqli_query($koneksi, $query);
     header("Location: kelola_wisata.php");
     exit();
 }
 
 if (isset($_GET['hapus'])) {
     $id_hapus = intval($_GET['hapus']);
-    $stmt = $koneksi->prepare("SELECT gambar FROM tbl_wisata WHERE id_wisata = ?");
-    $stmt->bind_param("i", $id_hapus);
-    $stmt->execute();
-    $res = $stmt->get_result();
-    $data = $res->fetch_assoc();
-    $stmt->close();
+    $res = mysqli_query($koneksi, "SELECT gambar FROM tbl_wisata WHERE id_wisata=$id_hapus");
+    $data = mysqli_fetch_assoc($res);
     if ($data && $data['gambar'] && file_exists("../uploads/".$data['gambar'])) {
         unlink("../uploads/".$data['gambar']);
     }
-    $stmt = $koneksi->prepare("DELETE FROM tbl_wisata WHERE id_wisata = ?");
-    $stmt->bind_param("i", $id_hapus);
-    $stmt->execute();
-    $stmt->close();
+    mysqli_query($koneksi, "DELETE FROM tbl_wisata WHERE id_wisata=$id_hapus");
     header("Location: kelola_wisata.php");
     exit();
 }
@@ -111,7 +76,6 @@ if (isset($_GET['edit'])) {
             <form method="POST" action="" enctype="multipart/form-data" class="grid md:grid-cols-2 gap-5">
                 <input type="hidden" name="id_wisata" value="<?= $data_edit['id_wisata'] ?? 0; ?>">
                 <input type="hidden" name="gambar_lama" value="<?= $data_edit['gambar'] ?? ''; ?>">
-                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generate_csrf_token()); ?>">
                 
                 <div>
                     <label class="block text-slate-400 text-sm font-semibold mb-2">Nama Paket</label>

@@ -19,6 +19,36 @@ define('TOKEN_EXPIRY', 8 * 3600);
 //   'role'    -> 1 sesi per role/hak akses (belum diaktifkan, lihat docs)
 define('SINGLE_SESSION_SCOPE', 'account');
 
+function ensure_login_session_table($koneksi) {
+    if (!$koneksi) {
+        return false;
+    }
+
+    $exists = mysqli_query($koneksi, "SHOW TABLES LIKE 'tbl_login_session'");
+    if ($exists && mysqli_num_rows($exists) > 0) {
+        $probe = mysqli_query($koneksi, "SELECT 1 FROM tbl_login_session LIMIT 1");
+        if ($probe === false && mysqli_errno($koneksi) == 1932) {
+            mysqli_query($koneksi, "DROP TABLE tbl_login_session");
+        }
+    }
+
+    $sql = "CREATE TABLE IF NOT EXISTS tbl_login_session (
+        id_session INT AUTO_INCREMENT PRIMARY KEY,
+        id_admin INT NOT NULL,
+        session_token VARCHAR(255) NOT NULL,
+        ip_address VARCHAR(45) DEFAULT NULL,
+        user_agent VARCHAR(255) DEFAULT NULL,
+        login_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        expires_at DATETIME NOT NULL,
+        is_active TINYINT(1) NOT NULL DEFAULT 1,
+        KEY idx_admin_session (id_admin, is_active),
+        KEY idx_token (session_token)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+
+    return mysqli_query($koneksi, $sql);
+}
+
 /**
  * Membuat token sesi acak yang aman (32 byte hex = 64 karakter)
  */
@@ -30,6 +60,8 @@ function generate_session_token() {
  * Menonaktifkan semua sesi lama milik admin (selain sesi baru).
  */
 function invalidate_old_login_sessions($koneksi, $id_admin, $except_token = '') {
+    ensure_login_session_table($koneksi);
+
     $stmt = $koneksi->prepare(
         "UPDATE tbl_login_session
          SET is_active = 0
@@ -43,6 +75,8 @@ function invalidate_old_login_sessions($koneksi, $id_admin, $except_token = '') 
  * Menyimpan sesi login baru ke database.
  */
 function register_db_session($koneksi, $id_admin, $token, $scope = SINGLE_SESSION_SCOPE) {
+    ensure_login_session_table($koneksi);
+
     $ip = $_SERVER['REMOTE_ADDR'] ?? '';
     $ua = substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 255);
     $expires = date('Y-m-d H:i:s', time() + TOKEN_EXPIRY);
@@ -64,6 +98,8 @@ function register_db_session($koneksi, $id_admin, $token, $scope = SINGLE_SESSIO
  * Membandingkan dengan hash_equals() agar aman dari timing attack.
  */
 function is_db_session_valid($koneksi, $id_admin, $token) {
+    ensure_login_session_table($koneksi);
+
     $stmt = $koneksi->prepare(
         "SELECT session_token, expires_at
          FROM tbl_login_session
@@ -98,6 +134,8 @@ function is_db_session_valid($koneksi, $id_admin, $token) {
  * Memperbarui waktu last_activity sesi di database.
  */
 function update_db_last_activity($koneksi, $id_admin, $token) {
+    ensure_login_session_table($koneksi);
+
     $stmt = $koneksi->prepare(
         "UPDATE tbl_login_session
          SET last_activity = NOW()
@@ -111,6 +149,8 @@ function update_db_last_activity($koneksi, $id_admin, $token) {
  * Menonaktifkan sesi saat ini (dipakai saat logout).
  */
 function invalidate_db_session($koneksi, $id_admin, $token) {
+    ensure_login_session_table($koneksi);
+
     $stmt = $koneksi->prepare(
         "UPDATE tbl_login_session
          SET is_active = 0

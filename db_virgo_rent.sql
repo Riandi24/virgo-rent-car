@@ -89,6 +89,20 @@ CREATE TABLE `tbl_kendaraan` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `tbl_kendaraan_foto`
+--
+
+CREATE TABLE `tbl_kendaraan_foto` (
+  `id_foto` int(11) NOT NULL AUTO_INCREMENT,
+  `id_kendaraan` int(11) NOT NULL,
+  `foto_path` varchar(255) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_foto`),
+  KEY `fk_foto_kendaraan` (`id_kendaraan`),
+  CONSTRAINT `fk_foto_kendaraan` FOREIGN KEY (`id_kendaraan`) REFERENCES `tbl_kendaraan` (`id_kendaraan`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
 -- Dumping data for table `tbl_kendaraan`
 --
 
@@ -180,6 +194,7 @@ CREATE TABLE `tbl_reviews` (
   `nama_pelanggan` varchar(100) NOT NULL,
   `rating` tinyint(4) NOT NULL DEFAULT 5,
   `komentar` text DEFAULT NULL,
+  `foto_review` varchar(255) DEFAULT NULL,
   `status` varchar(20) NOT NULL DEFAULT 'Approved',
   `tanggal` datetime DEFAULT current_timestamp(),
   PRIMARY KEY (`id_review`),
@@ -196,7 +211,7 @@ CREATE TABLE `tbl_reviews` (
 
 LOCK TABLES `tbl_reviews` WRITE;
 /*!40000 ALTER TABLE `tbl_reviews` DISABLE KEYS */;
-INSERT INTO `tbl_reviews` VALUES (1,10,'Karya Motor',4,'sangat bagus','Approved','2026-08-05 14:25:20');
+INSERT INTO `tbl_reviews` VALUES (1,10,'Karya Motor',4,'sangat bagus',NULL,'Approved','2026-08-05 14:25:20');
 /*!40000 ALTER TABLE `tbl_reviews` ENABLE KEYS */;
 UNLOCK TABLES;
 

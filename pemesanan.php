@@ -70,18 +70,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $tanggal_selesai_diminta = date('Y-m-d', strtotime($tanggal_mulai . " + $durasi days"));
         
 $query_cek = "SELECT * FROM tbl_reservasi 
-                  WHERE id_kendaraan = ? 
+                          WHERE id_kendaraan = $id_kendaraan 
                           AND status_reservasi NOT IN ('Dibatalkan', 'Selesai')
-                  AND tanggal_mulai < ?
-                  AND DATE_ADD(tanggal_mulai, INTERVAL durasi_hari DAY) > ?";
-$stmt = $koneksi->prepare($query_cek);
-$stmt->bind_param("iss", $id_kendaraan, $tanggal_selesai_diminta, $tanggal_mulai);
-$stmt->execute();
-$result_cek = $stmt->get_result();
-if ($result_cek && $result_cek->num_rows > 0) {
-    $error_msg = "Maaf, mobil ini sudah dipesan orang lain pada tanggal tersebut. Silakan pilih tanggal atau mobil lain (Sistem Pencegahan Double Order Berhasil Aktif).";
-}
-$stmt->close();
+                          AND tanggal_mulai < '$tanggal_selesai_diminta'
+                          AND DATE_ADD(tanggal_mulai, INTERVAL durasi_hari DAY) > '$tanggal_mulai'";
+        
+            $result_cek = mysqli_query($koneksi, $query_cek);
+        
+            if (mysqli_num_rows($result_cek) > 0) {
+                $error_msg = "Maaf, mobil ini sudah dipesan orang lain pada tanggal tersebut. Silakan pilih tanggal atau mobil lain (Sistem Pencegahan Double Order Berhasil Aktif).";
+            }
         } // akhir if punya_mobil
 
         if (!$error_msg) {
@@ -96,13 +94,10 @@ $stmt->close();
             if (mysqli_query($koneksi, $query_simpan)) {
                 // Ambil ID reservasi yang baru saja disimpan
                 $id_reservasi_baru = mysqli_insert_id($koneksi);
-                 
+                
                 // UPDATE STATUS MOBIL MENJADI "Terpesan" hanya jika ada mobil yang dipilih
                 if ($punya_mobil) {
-                    $stmt_up = $koneksi->prepare("UPDATE tbl_kendaraan SET status = 'Terpesan' WHERE id_kendaraan = ?");
-                    $stmt_up->bind_param("i", $id_kendaraan);
-                    $stmt_up->execute();
-                    $stmt_up->close();
+                    mysqli_query($koneksi, "UPDATE tbl_kendaraan SET status='Terpesan' WHERE id_kendaraan=$id_kendaraan");
                 }
                 
                 // Buat notifikasi WA ke Admin (085121540024)
@@ -137,11 +132,11 @@ $wa_text_admin .= "🔗 Konfirmasi di: " . (isset($_SERVER['HTTPS']) ? 'https://
 <!-- ==================== FORM PEMESANAN ==================== -->
 <section class="py-24 relative" id="pemesanan">
     <div class="max-w-5xl mx-auto px-6">
-        <div class="text-center mb-12 md:mb-16 fade-up">
+        <div class="text-center mb-16 fade-up">
             <div class="badge-blue inline-flex items-center gap-2 mb-4">
                 <i class="fas fa-clipboard-list"></i> FORM PEMESANAN
             </div>
-            <h2 class="section-title font-serif text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
+            <h2 class="section-title font-serif text-4xl md:text-5xl font-bold text-white mb-4">
                 Lengkapi <span class="grad-text">Pemesanan</span> Anda
             </h2>
             <p class="text-slate-400 max-w-xl mx-auto text-sm leading-relaxed">

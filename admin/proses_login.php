@@ -12,6 +12,45 @@ session_start();
 require '../koneksi.php';
 require 'single_session_helper.php'; // helper single session (anti login ganda)
 
+function ensure_admin_table_and_default_user($koneksi) {
+    if (!$koneksi) {
+        return false;
+    }
+
+    $exists = mysqli_query($koneksi, "SHOW TABLES LIKE 'tbl_admin'");
+    if ($exists && mysqli_num_rows($exists) > 0) {
+        $probe = mysqli_query($koneksi, "SELECT 1 FROM tbl_admin LIMIT 1");
+        if ($probe === false && mysqli_errno($koneksi) == 1932) {
+            mysqli_query($koneksi, "DROP TABLE tbl_admin");
+        }
+    }
+
+    $create_table = mysqli_query($koneksi, "CREATE TABLE IF NOT EXISTS tbl_admin (
+        id_admin INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(100) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL,
+        nama_lengkap VARCHAR(150) DEFAULT NULL,
+        email VARCHAR(150) DEFAULT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    if (!$create_table) {
+        return false;
+    }
+
+    $check_admin = mysqli_query($koneksi, "SELECT id_admin FROM tbl_admin WHERE username = 'admin' LIMIT 1");
+    if ($check_admin && mysqli_num_rows($check_admin) === 0) {
+        $default_hash = password_hash('admin123', PASSWORD_DEFAULT);
+        $insert_default = mysqli_query($koneksi, "INSERT INTO tbl_admin (username, password, nama_lengkap) VALUES ('admin', '$default_hash', 'Administrator')");
+        return $insert_default;
+    }
+
+    return true;
+}
+
+ensure_admin_table_and_default_user($koneksi);
+ensure_login_session_table($koneksi);
+
 // Hanya terima request POST (tidak bisa diakses langsung via URL)
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: login.php");

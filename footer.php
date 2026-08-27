@@ -1,7 +1,7 @@
 <!-- ==================== FOOTER ==================== -->
-<footer class="border-t border-slate-800/50 pt-12 md:pt-16 pb-8 md:mt-24 mt-16">
-        <div class="max-w-7xl mx-auto px-4 md:px-6">
-            <div class="grid md:grid-cols-4 gap-8 md:gap-12 mb-10 md:mb-12">
+    <footer class="border-t border-slate-800/50 pt-16 pb-8 mt-24">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid md:grid-cols-4 gap-12 mb-12">
                 <div class="md:col-span-2">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="w-10 h-10 rounded-xl grad-blue-green flex items-center justify-center">
